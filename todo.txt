@@ -1,0 +1,4 @@
+Уникальный username
+Добавить в базу данных уникальный email
+Уведомлять по email если кто-то ввел верный username и неверный пароль https://www.youtube.com/watch?v=H0HZc4FgX7E https://github.com/wneessen/go-mail/wiki
+Добавить функцию для изменения пароля
