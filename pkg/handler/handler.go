@@ -3,6 +3,8 @@ package handler
 import (
 	"todo-app/pkg/service"
 
+	_ "net/http/pprof"
+
 	"github.com/gin-gonic/gin"
 )
 
