@@ -1,0 +1,44 @@
+services:
+  app:
+    image: todo-app:local
+    container_name: td-backend
+    depends_on:
+      - postgresql
+    restart: on-failure
+    environment:
+      - DATABASE_URL=postgres://postgres:qwerty@td-psql:5432/postgres
+    networks:
+      - ps
+    ports:
+      - "8087:8087"
+
+  postgresql:
+    image: postgres:latest
+    container_name: td-psql
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=qwerty
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    networks:
+      - ps
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    image: migrate/migrate
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    networks:
+      - ps
+    volumes:
+      - ./schema:/migrations
+    command: [ "-path", "/migrations", "-database", "postgres://postgres:qwerty@td-psql:5432/postgres?sslmode=disable", "up" ]
+
+networks:
+  ps:
