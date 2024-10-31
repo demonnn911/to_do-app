@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"todo-app"
+	todo "todo-app/app-models"
 
 	"github.com/gin-gonic/gin"
 )

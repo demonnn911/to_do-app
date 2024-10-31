@@ -6,7 +6,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"todo-app"
+
+	todo "todo-app/app-models"
 	"todo-app/pkg/handler"
 	"todo-app/pkg/repository"
 	"todo-app/pkg/service"
