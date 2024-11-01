@@ -2,7 +2,7 @@ FROM golang:1.22.5-alpine AS builder
 
 WORKDIR /usr/local/src
 
-RUN apk --no-cache add git
+RUN apk --no-cache add git gcc g++ make 
 
 
 #dependencies

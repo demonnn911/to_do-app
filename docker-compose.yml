@@ -7,6 +7,8 @@ services:
     restart: on-failure
     environment:
       - DATABASE_URL=postgres://postgres:qwerty@td-psql:5432/postgres
+      - VIRTUAL_HOST=gotryandtest.ru
+      - LETSENCRYPT_HOST=gotryandtest.ru
     networks:
       - ps
     ports:
