@@ -1,11 +1,13 @@
 package service
 
 import (
+	"context"
 	"crypto/sha1"
 	"errors"
 	"fmt"
 	"time"
 	todo "todo-app/app-models"
+	"todo-app/clients/sso/grpc"
 	"todo-app/pkg/repository"
 
 	"github.com/dgrijalva/jwt-go"
@@ -23,16 +25,31 @@ type tokenClaims struct {
 }
 
 type AuthService struct {
-	repo repository.Authorization
+	repo      repository.Authorization
+	ssoClient *grpc.Client
 }
 
-func NewAuthService(repo repository.Authorization) *AuthService {
-	return &AuthService{repo: repo}
+func NewAuthService(repo repository.Authorization, ssoclient *grpc.Client) *AuthService {
+	return &AuthService{
+		repo:      repo,
+		ssoClient: ssoclient,
+	}
 }
 
+//func (s *AuthService) CreateUser(user todo.User) (int, error) {
+//	user.Password = generatePasswordHash(user.Password)
+//	return s.repo.CreateUser(user)
+//}
+
+// First try to connect grpc service
 func (s *AuthService) CreateUser(user todo.User) (int, error) {
-	user.Password = generatePasswordHash(user.Password)
-	return s.repo.CreateUser(user)
+	const op = "pkg.service.CreateUser()(grpc)"
+	ctx := context.Background()
+	id, err := s.ssoClient.Register(ctx, user.Email, user.Password)
+	if err != nil {
+		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+	return int(id), nil
 }
 
 func (s *AuthService) GenerateToken(username, password string) (string, error) {

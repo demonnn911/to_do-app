@@ -2,6 +2,7 @@ package service
 
 import (
 	todo "todo-app/app-models"
+	"todo-app/clients/sso/grpc"
 	"todo-app/pkg/repository"
 )
 
@@ -33,9 +34,9 @@ type Service struct {
 	ToDoItem
 }
 
-func NewService(repos *repository.Repository) *Service {
+func NewService(repos *repository.Repository, ssoclient *grpc.Client) *Service {
 	return &Service{
-		Authorization: NewAuthService(repos.Authorization),
+		Authorization: NewAuthService(repos.Authorization, ssoclient),
 		ToDoList:      NewToDoListService(repos.ToDoList),
 		ToDoItem:      NewToDoItemService(repos.ToDoItem, repos.ToDoList),
 	}
