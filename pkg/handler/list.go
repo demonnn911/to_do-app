@@ -53,7 +53,7 @@ func (h *Handler) getListById(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	listId, err := strconv.Atoi(c.Param("id"))
+	listId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can not get list_id from request")
 		return
@@ -71,7 +71,7 @@ func (h *Handler) deleteList(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	listId, err := strconv.Atoi(c.Param("id"))
+	listId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can'not get list_id from request")
 		return
@@ -93,7 +93,7 @@ func (h *Handler) updateList(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	listId, err := strconv.Atoi(c.Param("id"))
+	listId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "invalid list_id")
 	}

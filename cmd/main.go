@@ -6,8 +6,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	todo "todo-app/app-models"
+	ssogrpc "todo-app/clients/sso/grpc"
 	"todo-app/pkg/handler"
 	"todo-app/pkg/repository"
 	"todo-app/pkg/service"
@@ -38,8 +40,19 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("cannot initialize db: %s", err.Error())
 	}
+
+	logrus.Print("initializing grpc service")
+	ssoClient, err := ssogrpc.New(
+		logrus.New(),
+		"localhost:44044",
+		5*time.Second,
+		3,
+	)
+	if err != nil {
+		logrus.Fatal("failde to init sso client", err)
+	}
 	repos := repository.NewRepository(db)
-	service := service.NewService(repos)
+	service := service.NewService(repos, ssoClient)
 	handlers := handler.NewHandler(service)
 	srv := new(todo.Server)
 	go func() {

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	todo "todo-app/app-models"
 
@@ -15,15 +16,20 @@ func NewAuthSQL(db *sqlx.DB) *AuthSQL {
 	return &AuthSQL{db: db}
 }
 
-func (r *AuthSQL) CreateUser(user todo.User) (int, error) {
-	// TODO: уникальный username
-	var id int
-	query := fmt.Sprintf("INSERT INTO %s (name, username, password_hash, email) values ($1, $2, $3, $4) RETURNING id", usersTable)
-	row := r.db.QueryRow(query, user.Name, user.Username, user.Password, user.Email)
-	if err := row.Scan(&id); err != nil {
-		return 0, err
+func (r *AuthSQL) CreateUser(id int64) error {
+	query := fmt.Sprintf("INSERT INTO %s (id) VALUES ($1)", usersTable)
+	row, err := r.db.Exec(query, id)
+	if err != nil {
+		return err
 	}
-	return id, nil
+	res, err := row.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if res == 0 {
+		return errors.New("couldn't input user's data")
+	}
+	return nil
 }
 
 func (r *AuthSQL) GetUser(username, password string) (todo.User, error) {

@@ -13,29 +13,24 @@ func (h *Handler) signUp(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
-	id, err := h.services.Authorization.CreateUser(input)
+	_, err := h.services.Authorization.CreateUser(input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
+		"status": "You succesfully signed up!",
 	})
 
 }
 
-type signInInput struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
 func (h *Handler) signIn(c *gin.Context) {
-	var input signInInput
+	var input todo.SignInInput
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
-	token, err := h.services.Authorization.GenerateToken(input.Username, input.Password)
+	token, err := h.services.Authorization.Login(input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
