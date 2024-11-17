@@ -16,6 +16,8 @@ github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumC
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dm1tl/protos v0.0.1 h1:ml+sSeAa0WoNZhj9eOqJ8Hj345EnEDY+yT3X/wpgPs4=
 github.com/dm1tl/protos v0.0.1/go.mod h1:XRL3cQqlT82Ce9Yl/q1l81NHEIQX247Np7hqDPvgiKw=
+github.com/dm1tl/protos v0.0.4 h1:FfgUBpaDlHfXEwaRb0GFCOMFZLxB/6qvZLn/EN2oN2A=
+github.com/dm1tl/protos v0.0.4/go.mod h1:XRL3cQqlT82Ce9Yl/q1l81NHEIQX247Np7hqDPvgiKw=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nosvA=

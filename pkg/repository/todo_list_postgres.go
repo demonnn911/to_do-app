@@ -18,12 +18,12 @@ func NewToDoListPostgres(db *sqlx.DB) *ToDoListPostgres {
 	}
 }
 
-func (r *ToDoListPostgres) Create(userId int, list todo.ToDoList) (int, error) {
+func (r *ToDoListPostgres) Create(userId int64, list todo.ToDoList) (int64, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return 0, err
 	}
-	var id int
+	var id int64
 	createListQuery := fmt.Sprintf("INSERT INTO %s (title, description) VALUES($1, $2) RETURNING id", todoListTable)
 	row := tx.QueryRow(createListQuery, list.Title, list.Description)
 	if err := row.Scan(&id); err != nil {
@@ -39,14 +39,14 @@ func (r *ToDoListPostgres) Create(userId int, list todo.ToDoList) (int, error) {
 	return id, tx.Commit()
 }
 
-func (r *ToDoListPostgres) GetAll(userId int) ([]todo.ToDoList, error) {
+func (r *ToDoListPostgres) GetAll(userId int64) ([]todo.ToDoList, error) {
 	var lists []todo.ToDoList
 	query := fmt.Sprintf("SELECT tl.id, tl.title, tl.description FROM %s tl INNER JOIN %s ul ON tl.id = ul.list_id WHERE ul.user_id = $1", todoListTable, usersListsTable)
 	err := r.db.Select(&lists, query, userId)
 	return lists, err
 }
 
-func (r *ToDoListPostgres) GetById(userId, listId int) (todo.ToDoList, error) {
+func (r *ToDoListPostgres) GetById(userId, listId int64) (todo.ToDoList, error) {
 	var list todo.ToDoList
 	query := fmt.Sprintf("SELECT tl.id, tl.title, tl.description FROM %s tl INNER JOIN %s ul ON tl.id = ul.list_id WHERE ul.user_id = $1 AND ul.list_id = $2",
 		todoListTable, usersListsTable)
@@ -54,13 +54,13 @@ func (r *ToDoListPostgres) GetById(userId, listId int) (todo.ToDoList, error) {
 	return list, err
 }
 
-func (r *ToDoListPostgres) Delete(userId, listId int) error {
+func (r *ToDoListPostgres) Delete(userId, listId int64) error {
 	query := fmt.Sprintf("DELETE FROM %s tl using %s ul WHERE tl.id = ul.list_id AND ul.user_id = $1 AND ul.list_id = $2", todoListTable, usersListsTable)
 	_, err := r.db.Exec(query, userId, listId)
 	return err
 }
 
-func (r *ToDoListPostgres) Update(userId, listId int, updateData todo.UpdateListInput) error {
+func (r *ToDoListPostgres) Update(userId, listId int64, updateData todo.UpdateListInput) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1

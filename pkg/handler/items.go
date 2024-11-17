@@ -15,7 +15,7 @@ func (h *Handler) createItem(c *gin.Context) {
 		return
 	}
 
-	listId, err := strconv.Atoi(c.Param("id"))
+	listId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get list_id")
 		return
@@ -43,7 +43,7 @@ func (h *Handler) getAllItems(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get user id")
 		return
 	}
-	listId, err := strconv.Atoi(c.Param("id"))
+	listId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get list with such id")
 	}
@@ -63,7 +63,7 @@ func (h *Handler) getItemById(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get user id")
 		return
 	}
-	itemId, err := strconv.Atoi(c.Param("id"))
+	itemId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "invalid item_id")
 	}
@@ -83,7 +83,7 @@ func (h *Handler) updateItem(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get user id")
 		return
 	}
-	itemId, err := strconv.Atoi(c.Param("id"))
+	itemId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "invalid item_id")
 	}
@@ -108,7 +108,7 @@ func (h *Handler) deleteItem(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get user id")
 		return
 	}
-	itemId, err := strconv.Atoi(c.Param("id"))
+	itemId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "invalid item_id")
 	}

@@ -3,19 +3,19 @@ package todo
 import "errors"
 
 type ToDoList struct {
-	Id          int    `json:"id" db:"id"`
+	Id          int64  `json:"id" db:"id"`
 	Title       string `json:"title" db:"title" binding:"required"`
 	Description string `json:"description" db:"description"`
 }
 
 type UsersList struct {
-	Id     int
-	UserId int
-	ListId int
+	Id     int64
+	UserId int64
+	ListId int64
 }
 
 type ToDoItem struct {
-	Id          int    `json:"id"`
+	Id          int64  `json:"id"`
 	Title       string `json:"title" db:"title" binding:"required"`
 	Description string `json:"description" db:"description"`
 	Done        bool   `json:"done" db:"done"`
@@ -35,9 +35,9 @@ func (u *UpdateItemInput) Validate() error {
 }
 
 type ListsItem struct {
-	Id     int
-	ListId int
-	ItemId int
+	Id     int64
+	ListId int64
+	ItemId int64
 }
 
 type UpdateListInput struct {

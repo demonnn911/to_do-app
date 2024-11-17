@@ -60,13 +60,11 @@ func (c *Client) Login(ctx context.Context,
 	email string,
 	password string) (string, error) {
 	const op = "clients.sso.grpc.Login()"
-	//TODO fix logic linked with functionality of proto file(appId, isAdmin)
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 	resp, err := c.api.Login(ctx, &ssov1.LoginRequest{
 		Email:    email,
 		Password: password,
-		AppId:    1,
 	})
 	if err != nil {
 		return "", fmt.Errorf("%s: %w", op, err)
@@ -89,4 +87,18 @@ func (c *Client) Register(ctx context.Context,
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 	return resp.UserId, nil
+}
+
+func (c *Client) ValidateToken(ctx context.Context,
+	token string) (int64, error) {
+	const op = "clients.sso.grpc.ValidateToken()"
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	resp, err := c.api.ValidateToken(ctx, &ssov1.ValidateTokenRequest{
+		Token: token,
+	})
+	if err != nil {
+		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+	return resp.Id, nil
 }

@@ -7,24 +7,24 @@ import (
 )
 
 type Authorization interface {
-	CreateUser(user todo.User) (int, error)
+	CreateUser(id int64) error
 	GetUser(username, password string) (todo.User, error)
 }
 
 type ToDoList interface {
-	Create(userId int, list todo.ToDoList) (int, error)
-	GetAll(userId int) ([]todo.ToDoList, error)
-	GetById(userId, listId int) (todo.ToDoList, error)
-	Delete(userId, listId int) error
-	Update(userId, listId int, updateData todo.UpdateListInput) error
+	Create(userId int64, list todo.ToDoList) (int64, error)
+	GetAll(userId int64) ([]todo.ToDoList, error)
+	GetById(userId, listId int64) (todo.ToDoList, error)
+	Delete(userId, listId int64) error
+	Update(userId, listId int64, updateData todo.UpdateListInput) error
 }
 
 type ToDoItem interface {
-	Create(listId int, item todo.ToDoItem) (int, error)
-	GetAll(listId int) ([]todo.ToDoItem, error)
-	GetById(userId, itemId int) (todo.ToDoItem, error)
-	Delete(userId, itemId int) error
-	Update(userId, listId int, updateData todo.UpdateItemInput) error
+	Create(listId int64, item todo.ToDoItem) (int64, error)
+	GetAll(listId int64) ([]todo.ToDoItem, error)
+	GetById(userId, itemId int64) (todo.ToDoItem, error)
+	Delete(userId, itemId int64) error
+	Update(userId, listId int64, updateData todo.UpdateItemInput) error
 }
 
 type Repository struct {
