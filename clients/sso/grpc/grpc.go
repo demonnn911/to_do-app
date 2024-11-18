@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -16,7 +17,8 @@ import (
 )
 
 type Client struct {
-	api ssov1.AuthClient
+	authAPI ssov1.AuthClient
+	userAPI ssov1.UserClient
 }
 
 func New(
@@ -26,8 +28,6 @@ func New(
 	retriesCount int,
 ) (*Client, error) {
 	const op = "clients.sso.grpc.New()"
-	//сc, err := grpc.DialContext()
-
 	retryOpts := []grpcretry.CallOption{
 		grpcretry.WithCodes(codes.NotFound, codes.Aborted, codes.DeadlineExceeded),
 		grpcretry.WithMax(uint(retriesCount)),
@@ -46,7 +46,8 @@ func New(
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 	return &Client{
-		api: ssov1.NewAuthClient(cc),
+		authAPI: ssov1.NewAuthClient(cc),
+		userAPI: ssov1.NewUserClient(cc),
 	}, nil
 }
 
@@ -62,7 +63,7 @@ func (c *Client) Login(ctx context.Context,
 	const op = "clients.sso.grpc.Login()"
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	resp, err := c.api.Login(ctx, &ssov1.LoginRequest{
+	resp, err := c.authAPI.Login(ctx, &ssov1.LoginRequest{
 		Email:    email,
 		Password: password,
 	})
@@ -79,7 +80,7 @@ func (c *Client) Register(ctx context.Context,
 	const op = "clients.sso.grpc.Register()"
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	resp, err := c.api.Register(ctx, &ssov1.RegisterRequest{
+	resp, err := c.authAPI.Register(ctx, &ssov1.RegisterRequest{
 		Email:    email,
 		Password: password,
 	})
@@ -94,11 +95,28 @@ func (c *Client) ValidateToken(ctx context.Context,
 	const op = "clients.sso.grpc.ValidateToken()"
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	resp, err := c.api.ValidateToken(ctx, &ssov1.ValidateTokenRequest{
+	resp, err := c.authAPI.ValidateToken(ctx, &ssov1.ValidateTokenRequest{
 		Token: token,
 	})
 	if err != nil {
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 	return resp.Id, nil
+}
+
+func (c *Client) Delete(ctx context.Context,
+	id int64) (err error) {
+	const op = "clients.sso.grpc.Delete()"
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	resp, err := c.userAPI.Delete(ctx, &ssov1.DeleteRequest{
+		Id: id,
+	})
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+	if resp.ErrorMessage != "success" {
+		return errors.New("couldn't delete user from grpc db")
+	}
+	return nil
 }

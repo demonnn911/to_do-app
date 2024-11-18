@@ -3,7 +3,7 @@ module todo-app
 go 1.23.2
 
 require (
-	github.com/dm1tl/protos v0.0.4
+	github.com/dm1tl/protos v0.0.5
 	github.com/gin-gonic/gin v1.10.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/jmoiron/sqlx v1.4.0
