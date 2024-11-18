@@ -10,33 +10,22 @@ import (
 
 	todo "todo-app/app-models"
 	ssogrpc "todo-app/clients/sso/grpc"
+	"todo-app/pkg/config"
 	"todo-app/pkg/handler"
 	"todo-app/pkg/repository"
 	"todo-app/pkg/service"
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"github.com/spf13/viper"
 )
 
+// TODO refactor initializing ssoClient, remove hardcode, from srv.Run method
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
-	if err := initConfig(); err != nil {
-		logrus.Fatalf("error initializing configs: %s", err.Error())
-	}
-	if err := godotenv.Load(); err != nil {
-		logrus.Fatalf("failed to load env variables: %s", err.Error())
-	}
-	db, err := repository.NewPostgresDB(&repository.Config{
-		Host:     viper.GetString("db.host"),
-		Port:     viper.GetString("db.port"),
-		Username: viper.GetString("db.user"),
-		Password: os.Getenv("DB_PASSWORD"),
-		DBName:   viper.GetString("db.dbname"),
-		SSLMode:  viper.GetString("db.sslmode"),
-	})
+	dbConfig := config.NewDBConfig()
+	logrus.Info(dbConfig)
+	db, err := repository.NewPostgresDB(dbConfig)
 	if err != nil {
 		logrus.Fatalf("cannot initialize db: %s", err.Error())
 	}
@@ -56,7 +45,7 @@ func main() {
 	handlers := handler.NewHandler(service)
 	srv := new(todo.Server)
 	go func() {
-		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil && err != http.ErrServerClosed {
+		if err := srv.Run("8082", handlers.InitRoutes()); err != nil && err != http.ErrServerClosed {
 			logrus.Fatalf("cannot start server %s", err.Error())
 		}
 	}()
@@ -72,10 +61,4 @@ func main() {
 		logrus.Errorf("couldn't close db connection %s", err.Error())
 	}
 	logrus.Print("Todo app shutted down")
-}
-
-func initConfig() error {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
 }

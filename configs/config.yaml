@@ -1,8 +1,6 @@
 port: "8082"
 
-db:
-  host: localhost
-  port: "5436"
-  user: "postgres"
-  dbname: "postgres"
-  sslmode: "disable"
+sso:
+  address: localhost:44044
+  timeout: 5s
+  retriescount: 3
