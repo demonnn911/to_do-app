@@ -20,23 +20,21 @@ func NewAuthService(repo repository.Authorization, ssoclient *grpc.Client) *Auth
 	}
 }
 
-func (s *AuthService) CreateUser(user todo.User) (int64, error) {
+func (s *AuthService) CreateUser(ctx context.Context, user todo.User) (int64, error) {
 	const op = "pkg.service.CreateUser()(grpc)"
-	ctx := context.Background()
 	id, err := s.ssoClient.Register(ctx, user.Email, user.Password)
 	if err != nil {
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
-	err = s.repo.CreateUser(id)
+	err = s.repo.CreateUser(ctx, id)
 	if err != nil {
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 	return id, err
 }
 
-func (s *AuthService) Login(input todo.SignInInput) (string, error) {
+func (s *AuthService) Login(ctx context.Context, input todo.SignInInput) (string, error) {
 	const op = "pkg.service.Login()(grpc)"
-	ctx := context.Background()
 	token, err := s.ssoClient.Login(ctx, input.Email, input.Password)
 	if err != nil {
 		return "", fmt.Errorf("%s: %w", op, err)
@@ -44,9 +42,9 @@ func (s *AuthService) Login(input todo.SignInInput) (string, error) {
 	return token, nil
 }
 
-func (s *AuthService) ValidateToken(token string) (int64, error) {
+func (s *AuthService) ValidateToken(ctx context.Context, token string) (int64, error) {
 	const op = "pkg.service.ValidateToken()(grpc)"
-	ctx := context.Background()
+
 	id, err := s.ssoClient.ValidateToken(ctx, token)
 	if err != nil {
 		return 0, fmt.Errorf("%s: %w", op, err)

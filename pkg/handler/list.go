@@ -1,14 +1,18 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 	"strconv"
+	"time"
 	todo "todo-app/app-models"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (h *Handler) createList(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
 	userId, err := h.getUserId(c)
 	if err != nil {
 		return
@@ -19,7 +23,7 @@ func (h *Handler) createList(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, "could not parse body of request")
 		return
 	}
-	listId, err := h.services.ToDoList.Create(userId, input)
+	listId, err := h.services.ToDoList.Create(ctx, userId, input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -34,11 +38,13 @@ type getAllListResponse struct {
 }
 
 func (h *Handler) getAllLists(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
 	userId, err := h.getUserId(c)
 	if err != nil {
 		return
 	}
-	lists, err := h.services.ToDoList.GetAll(userId)
+	lists, err := h.services.ToDoList.GetAll(ctx, userId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "couldn't get lists for this id")
 		return
@@ -49,6 +55,8 @@ func (h *Handler) getAllLists(c *gin.Context) {
 }
 
 func (h *Handler) getListById(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
 	userId, err := h.getUserId(c)
 	if err != nil {
 		return
@@ -58,7 +66,7 @@ func (h *Handler) getListById(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, "can not get list_id from request")
 		return
 	}
-	list, err := h.services.ToDoList.GetById(userId, listId)
+	list, err := h.services.ToDoList.GetById(ctx, userId, listId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "couldn't get lists for this id")
 		return
@@ -67,6 +75,8 @@ func (h *Handler) getListById(c *gin.Context) {
 }
 
 func (h *Handler) deleteList(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
 	userId, err := h.getUserId(c)
 	if err != nil {
 		return
@@ -77,7 +87,7 @@ func (h *Handler) deleteList(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.ToDoList.Delete(userId, listId); err != nil {
+	if err := h.services.ToDoList.Delete(ctx, userId, listId); err != nil {
 		newErrorResponse(c, http.StatusNoContent, "can not delete list")
 		return
 	} else {
@@ -89,6 +99,8 @@ func (h *Handler) deleteList(c *gin.Context) {
 }
 
 func (h *Handler) updateList(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
 	userId, err := h.getUserId(c)
 	if err != nil {
 		return
@@ -104,7 +116,7 @@ func (h *Handler) updateList(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, "invalid request body")
 	}
 
-	if err := h.services.ToDoList.Update(userId, listId, updateData); err != nil {
+	if err := h.services.ToDoList.Update(ctx, userId, listId, updateData); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't update list")
 	} else {
 		c.JSON(http.StatusOK, statusResponse{

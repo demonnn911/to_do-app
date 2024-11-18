@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	todo "todo-app/app-models"
 	"todo-app/pkg/repository"
@@ -18,35 +19,35 @@ func NewToDoItemService(repo repository.ToDoItem, listRepo repository.ToDoList) 
 	}
 }
 
-func (s *ToDoItemService) Create(userId, listId int64, item todo.ToDoItem) (int64, error) {
-	_, err := s.ListRepo.GetById(userId, listId)
+func (s *ToDoItemService) Create(ctx context.Context, userId, listId int64, item todo.ToDoItem) (int64, error) {
+	_, err := s.ListRepo.GetById(ctx, userId, listId)
 	if err != nil {
 		return 0, errors.New("there is no list with such id, or user doesn't have permission for it")
 	}
-	return s.Repo.Create(listId, item)
+	return s.Repo.Create(ctx, listId, item)
 }
 
-func (s *ToDoItemService) GetAll(userId, listId int64) ([]todo.ToDoItem, error) {
-	_, err := s.ListRepo.GetById(userId, listId)
+func (s *ToDoItemService) GetAll(ctx context.Context, userId, listId int64) ([]todo.ToDoItem, error) {
+	_, err := s.ListRepo.GetById(ctx, userId, listId)
 	if err != nil {
 		return nil, errors.New("there is no list with such id, or user doesn't have permission for it")
 	}
 	//	return s.Repo.GetAll(userId, listId)
-	return s.Repo.GetAll(listId)
+	return s.Repo.GetAll(ctx, listId)
 
 }
 
-func (s *ToDoItemService) GetById(userId, itemId int64) (todo.ToDoItem, error) {
-	return s.Repo.GetById(userId, itemId)
+func (s *ToDoItemService) GetById(ctx context.Context, userId, itemId int64) (todo.ToDoItem, error) {
+	return s.Repo.GetById(ctx, userId, itemId)
 }
 
-func (s *ToDoItemService) Delete(userId, itemId int64) error {
-	return s.Repo.Delete(userId, itemId)
+func (s *ToDoItemService) Delete(ctx context.Context, userId, itemId int64) error {
+	return s.Repo.Delete(ctx, userId, itemId)
 }
 
-func (s *ToDoItemService) Update(userId, listId int64, updateData todo.UpdateItemInput) error {
+func (s *ToDoItemService) Update(ctx context.Context, userId, listId int64, updateData todo.UpdateItemInput) error {
 	if err := updateData.Validate(); err != nil {
 		return err
 	}
-	return s.Repo.Update(userId, listId, updateData)
+	return s.Repo.Update(ctx, userId, listId, updateData)
 }

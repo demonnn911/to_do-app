@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +17,8 @@ const (
 )
 
 func (h *Handler) userIdentity(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
 	header := c.GetHeader(authorizationHeader)
 	if header == "" {
 		newErrorResponse(c, http.StatusUnauthorized, "empty header")
@@ -25,7 +29,7 @@ func (h *Handler) userIdentity(c *gin.Context) {
 		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
 		return
 	}
-	userId, err := h.services.ValidateToken(headerParts[1])
+	userId, err := h.services.ValidateToken(ctx, headerParts[1])
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, "incorrect token value")
 	}

@@ -1,14 +1,18 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 	"strconv"
+	"time"
 	todo "todo-app/app-models"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (h *Handler) createItem(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
 	userId, err := h.getUserId(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get user's id")
@@ -25,7 +29,7 @@ func (h *Handler) createItem(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, "can't parse request data")
 		return
 	}
-	itemId, err := h.services.ToDoItem.Create(userId, listId, item)
+	itemId, err := h.services.ToDoItem.Create(ctx, userId, listId, item)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't create item")
 		return
@@ -38,6 +42,8 @@ func (h *Handler) createItem(c *gin.Context) {
 }
 
 func (h *Handler) getAllItems(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
 	userId, err := h.getUserId(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get user id")
@@ -48,7 +54,7 @@ func (h *Handler) getAllItems(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get list with such id")
 	}
 
-	items, err := h.services.ToDoItem.GetAll(userId, listId)
+	items, err := h.services.ToDoItem.GetAll(ctx, userId, listId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get items from list with this id")
 	} else {
@@ -58,6 +64,8 @@ func (h *Handler) getAllItems(c *gin.Context) {
 }
 
 func (h *Handler) getItemById(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
 	userId, err := h.getUserId(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get user id")
@@ -68,7 +76,7 @@ func (h *Handler) getItemById(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, "invalid item_id")
 	}
 
-	item, err := h.services.ToDoItem.GetById(userId, itemId)
+	item, err := h.services.ToDoItem.GetById(ctx, userId, itemId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get item with such id")
 	} else {
@@ -78,6 +86,8 @@ func (h *Handler) getItemById(c *gin.Context) {
 }
 
 func (h *Handler) updateItem(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
 	userId, err := h.getUserId(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get user id")
@@ -92,7 +102,7 @@ func (h *Handler) updateItem(c *gin.Context) {
 	if err := c.BindJSON(&updateDataInput); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't parse update item input")
 	}
-	if err := h.services.ToDoItem.Update(userId, itemId, updateDataInput); err != nil {
+	if err := h.services.ToDoItem.Update(ctx, userId, itemId, updateDataInput); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't update item with such id")
 	} else {
 		c.JSON(http.StatusOK, statusResponse{
@@ -103,6 +113,8 @@ func (h *Handler) updateItem(c *gin.Context) {
 }
 
 func (h *Handler) deleteItem(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
 	userId, err := h.getUserId(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't get user id")
@@ -112,7 +124,7 @@ func (h *Handler) deleteItem(c *gin.Context) {
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "invalid item_id")
 	}
-	if err := h.services.ToDoItem.Delete(userId, itemId); err != nil {
+	if err := h.services.ToDoItem.Delete(ctx, userId, itemId); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "can't delete item with such id")
 	} else {
 		c.JSON(http.StatusOK, statusResponse{
