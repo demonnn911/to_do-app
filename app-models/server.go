@@ -3,21 +3,21 @@ package todo
 import (
 	"context"
 	"net/http"
-	"time"
+	"todo-app/pkg/config"
 )
 
 type Server struct {
 	httpServer *http.Server
 }
 
-func (s *Server) Run(port string, handler http.Handler) error {
+func (s *Server) Run(cfg config.HTTPServer, handler http.Handler) error {
 	s.httpServer = &http.Server{
-		Addr:           ":" + port,
-		MaxHeaderBytes: 1 << 20,
+		Addr:           cfg.Address,
+		MaxHeaderBytes: cfg.MaxHeaderBytes,
 		Handler:        handler,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		IdleTimeout:    60 * time.Second,
+		ReadTimeout:    cfg.ReadTimeout,
+		WriteTimeout:   cfg.WriteTimeout,
+		IdleTimeout:    cfg.IdleTimeout,
 	}
 	return s.httpServer.ListenAndServe()
 }

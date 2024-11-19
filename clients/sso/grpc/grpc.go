@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -22,20 +21,18 @@ type Client struct {
 
 func New(
 	log *logrus.Logger,
-	addr string,
-	timeout time.Duration,
-	retriesCount int,
+	cfg SSOConfig,
 ) (*Client, error) {
 	const op = "clients.sso.grpc.New()"
 	retryOpts := []grpcretry.CallOption{
 		grpcretry.WithCodes(codes.NotFound, codes.Aborted, codes.DeadlineExceeded),
-		grpcretry.WithMax(uint(retriesCount)),
-		grpcretry.WithPerRetryTimeout(timeout),
+		grpcretry.WithMax(cfg.RetriesCount),
+		grpcretry.WithPerRetryTimeout(cfg.Timeout),
 	}
 	logOpts := []grpclog.Option{
 		grpclog.WithLogOnEvents(grpclog.PayloadReceived, grpclog.PayloadSent),
 	}
-	cc, err := grpc.NewClient(addr,
+	cc, err := grpc.NewClient(cfg.Address,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithChainUnaryInterceptor(
 			grpclog.UnaryClientInterceptor(InterceptorLogger(log), logOpts...),

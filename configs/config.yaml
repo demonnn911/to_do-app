@@ -1,6 +1,0 @@
-port: "8082"
-
-sso:
-  address: localhost:44044
-  timeout: 5s
-  retriescount: 3

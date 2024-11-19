@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	todo "todo-app/app-models"
 	ssogrpc "todo-app/clients/sso/grpc"
@@ -31,11 +30,11 @@ func main() {
 	}
 
 	logrus.Print("initializing grpc service")
+	ssoConfig := ssogrpc.NewSSOConfig()
+	logrus.Info(ssoConfig)
 	ssoClient, err := ssogrpc.New(
 		logrus.New(),
-		"localhost:44044",
-		5*time.Second,
-		3,
+		*ssoConfig,
 	)
 	if err != nil {
 		logrus.Fatal("failde to init sso client", err)
@@ -44,8 +43,10 @@ func main() {
 	service := service.NewService(repos, ssoClient)
 	handlers := handler.NewHandler(service)
 	srv := new(todo.Server)
+	srvConfig := config.NewHTTPServerConfig()
+	logrus.Info(srvConfig)
 	go func() {
-		if err := srv.Run("8082", handlers.InitRoutes()); err != nil && err != http.ErrServerClosed {
+		if err := srv.Run(*srvConfig, handlers.InitRoutes()); err != nil && err != http.ErrServerClosed {
 			logrus.Fatalf("cannot start server %s", err.Error())
 		}
 	}()
