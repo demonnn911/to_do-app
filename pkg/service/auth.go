@@ -10,10 +10,10 @@ import (
 
 type AuthService struct {
 	repo      repository.Authorization
-	ssoClient *grpc.Client
+	ssoClient grpc.SSOProvider
 }
 
-func NewAuthService(repo repository.Authorization, ssoclient *grpc.Client) *AuthService {
+func NewAuthService(repo repository.Authorization, ssoclient grpc.SSOProvider) *AuthService {
 	return &AuthService{
 		repo:      repo,
 		ssoClient: ssoclient,
@@ -40,6 +40,7 @@ func (s *AuthService) Login(ctx context.Context, input todo.SignInInput) (string
 	const op = "pkg.service.Login()(grpc)"
 	token, err := s.ssoClient.Login(ctx, input.Email, input.Password)
 	if err != nil {
+
 		return "", fmt.Errorf("%s: %w", op, err)
 	}
 	return token, nil

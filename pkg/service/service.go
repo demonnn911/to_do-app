@@ -35,9 +35,9 @@ type Service struct {
 	ToDoItem
 }
 
-func NewService(repos *repository.Repository, ssoclient *grpc.Client) *Service {
+func NewService(repos *repository.Repository, client *grpc.SSOClientWrapper) *Service {
 	return &Service{
-		Authorization: NewAuthService(repos.Authorization, ssoclient),
+		Authorization: NewAuthService(repos.Authorization, client.SSOProvider),
 		ToDoList:      NewToDoListService(repos.ToDoList),
 		ToDoItem:      NewToDoItemService(repos.ToDoItem, repos.ToDoList),
 	}

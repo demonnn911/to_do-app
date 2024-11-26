@@ -8,8 +8,10 @@ import (
 	"syscall"
 
 	todo "todo-app/app-models"
+	"todo-app/clients/sso/grpc"
 	ssogrpc "todo-app/clients/sso/grpc"
 	"todo-app/pkg/config"
+	"todo-app/pkg/config/env"
 	"todo-app/pkg/handler"
 	"todo-app/pkg/repository"
 	"todo-app/pkg/service"
@@ -22,9 +24,15 @@ import (
 // TODO refactor initializing ssoClient, remove hardcode, from srv.Run method
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
-	dbConfig := config.NewDBConfig()
-	logrus.Info(dbConfig)
-	db, err := repository.NewPostgresDB(dbConfig)
+	if err := config.Load(); err != nil {
+		logrus.Fatal("couldn't load env variables")
+	}
+	cfg, err := env.NewDBConfig()
+	if err != nil {
+		logrus.Fatal("couldn't load db config")
+	}
+	logrus.Info(cfg)
+	db, err := repository.NewPostgresDB(cfg)
 	if err != nil {
 		logrus.Fatalf("cannot initialize db: %s", err.Error())
 	}
@@ -32,13 +40,14 @@ func main() {
 	logrus.Print("initializing grpc service")
 	ssoConfig := ssogrpc.NewSSOConfig()
 	logrus.Info(ssoConfig)
-	ssoClient, err := ssogrpc.New(
+	ssoGRPCClient, err := ssogrpc.NewSSOServiceClient(
 		logrus.New(),
 		*ssoConfig,
 	)
 	if err != nil {
 		logrus.Fatal("failde to init sso client", err)
 	}
+	ssoClient := grpc.NewSSOClientWrapper(ssoGRPCClient)
 	repos := repository.NewRepository(db)
 	service := service.NewService(repos, ssoClient)
 	handlers := handler.NewHandler(service)

@@ -9,7 +9,7 @@ import (
 	ssov1 "github.com/dm1tl/protos/gen/go/sso"
 )
 
-func (c *Client) Login(ctx context.Context,
+func (c *SSOServiceClient) Login(ctx context.Context,
 	email string,
 	password string) (string, error) {
 	const op = "clients.sso.grpc.Login()"
@@ -25,7 +25,7 @@ func (c *Client) Login(ctx context.Context,
 	return resp.Token, nil
 }
 
-func (c *Client) Register(ctx context.Context,
+func (c *SSOServiceClient) Register(ctx context.Context,
 	email string,
 	password string,
 ) (int64, error) {
@@ -42,7 +42,7 @@ func (c *Client) Register(ctx context.Context,
 	return resp.UserId, nil
 }
 
-func (c *Client) ValidateToken(ctx context.Context,
+func (c *SSOServiceClient) ValidateToken(ctx context.Context,
 	token string) (int64, error) {
 	const op = "clients.sso.grpc.ValidateToken()"
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -56,7 +56,7 @@ func (c *Client) ValidateToken(ctx context.Context,
 	return resp.Id, nil
 }
 
-func (c *Client) Delete(ctx context.Context,
+func (c *SSOServiceClient) Delete(ctx context.Context,
 	id int64) (err error) {
 	const op = "clients.sso.grpc.Delete()"
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)

@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -33,7 +32,6 @@ func (h *Handler) userIdentity(c *gin.Context) {
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, "incorrect token value")
 	}
-	fmt.Println(userId)
 	c.Set(userCtx, userId)
 }
 

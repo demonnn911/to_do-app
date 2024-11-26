@@ -14,15 +14,32 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type Client struct {
+type SSOServiceClient struct {
 	authAPI ssov1.AuthClient
 	userAPI ssov1.UserClient
 }
 
-func New(
+type SSOClientWrapper struct {
+	SSOProvider
+}
+
+func NewSSOClientWrapper(provider SSOProvider) *SSOClientWrapper {
+	return &SSOClientWrapper{
+		SSOProvider: provider,
+	}
+}
+
+type SSOProvider interface {
+	Register(ctx context.Context, email string, password string) (int64, error)
+	Login(ctx context.Context, email string, password string) (string, error)
+	ValidateToken(ctx context.Context, token string) (int64, error)
+	Delete(ctx context.Context, id int64) error
+}
+
+func NewSSOServiceClient(
 	log *logrus.Logger,
 	cfg SSOConfig,
-) (*Client, error) {
+) (*SSOServiceClient, error) {
 	const op = "clients.sso.grpc.New()"
 	retryOpts := []grpcretry.CallOption{
 		grpcretry.WithCodes(codes.NotFound, codes.Aborted, codes.DeadlineExceeded),
@@ -41,7 +58,7 @@ func New(
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
-	return &Client{
+	return &SSOServiceClient{
 		authAPI: ssov1.NewAuthClient(cc),
 		userAPI: ssov1.NewUserClient(cc),
 	}, nil
